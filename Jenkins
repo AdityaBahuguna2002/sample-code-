@@ -22,13 +22,21 @@ pipeline{
                 }
             }
         }
+        //  scan the code and also all dependency
         stage("OWASP Dependency Check"){  //  scan the code and also all dependency
             steps {
-                echo "OWASP Dependency check here"
-                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'dc'
+                echo "Running OWASP Dependency Check"
+                dependencyCheck additionalArguments: '--scan ./ --format ALL', odcInstallation: 'dc'
                 dependencyCheckPublisher pattern: "**/dependency-check-report.html"
             }
         }
+        // stage("OWASP Dependency Check") {
+            // steps {
+                // echo "Running OWASP Dependency Check"
+                // dependencyCheck additionalArguments: '--scan ./ --format ALL', odcInstallation: 'dc'
+                // dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            // }
+        // }
         stage('Sonar Quality Gate scan'){
             steps{
                 timeout(time:2, unit:"MINUTES"){
