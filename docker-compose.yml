@@ -1,0 +1,57 @@
+services:
+  app:
+    build: .
+    container_name: cynoteck-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=mysql            # internal service name of mysql
+      - DB_PORT=3306             # MySQL container's port fixed
+      - DB_USERNAME=root
+      - DB_PASSWORD=Cyno@123#45
+      - DB_NAME=cynoteck_test
+    depends_on:
+      - mysql
+    networks:
+      - cyno-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=Cyno@123#45
+      - MYSQL_DATABASE=cynoteck_test
+    ports:
+      - "3307:3306"              # mapping host 3307 → container 3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./cynoteck_test.sql:/docker-entrypoint-initdb.d/db.sql
+    networks:
+      - cyno-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin 
+    restart: always 
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=Cyno@123#45
+    depends_on:
+      - mysql
+    ports:
+      - "9090:80"  # Port Host --> Container (Default port of PhpMyAdmin: 80)
+    networks:
+      - cyno-network
+
+volumes:
+  mysql-data:
+
+networks:
+  cyno-network:
+    driver: bridge
