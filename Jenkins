@@ -66,8 +66,8 @@ pipeline{
                 echo "Docker-compose Deploying the code"
                 script{
                     sh """
-                        docker-compose down -v || true
-                        docker-compose up -d --build
+                        docker compose down -v || true
+                        docker compose up -d --build
                        """
                 }
             }
