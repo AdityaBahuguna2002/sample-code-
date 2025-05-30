@@ -23,20 +23,13 @@ pipeline{
             }
         }
         //  scan the code and also all dependency
-        stage("OWASP Dependency Check"){  //  scan the code and also all dependency
+        stage("OWASP Dependency Check") {
             steps {
                 echo "Running OWASP Dependency Check"
                 dependencyCheck additionalArguments: '--scan ./ --format ALL', odcInstallation: 'dc'
-                dependencyCheckPublisher pattern: "**/dependency-check-report.html"
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
-        // stage("OWASP Dependency Check") {
-            // steps {
-                // echo "Running OWASP Dependency Check"
-                // dependencyCheck additionalArguments: '--scan ./ --format ALL', odcInstallation: 'dc'
-                // dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            // }
-        // }
         stage('Sonar Quality Gate scan'){
             steps{
                 timeout(time:2, unit:"MINUTES"){
@@ -82,6 +75,9 @@ pipeline{
         }
     }
     post{
+        always {
+            archiveArtifacts artifacts: '**/dependency-check-report.html', fingerprint: true
+        }
         success{
             echo "deployed successfully"
         }
